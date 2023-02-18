@@ -1,0 +1,3 @@
+Hello
+This is full file
+Have a nice day!
