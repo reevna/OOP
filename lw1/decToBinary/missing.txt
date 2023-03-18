@@ -1,0 +1,2 @@
+Invalid arguments count
+Enter number to convert to binary

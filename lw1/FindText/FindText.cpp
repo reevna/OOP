@@ -10,12 +10,15 @@
 В комплекте с программой должны обязательно поставляться файлы, позволяющие проверить корректность её работы в автоматическом режиме.
 */
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <optional>
 #include <string>
+#include <vector>
 
 using namespace std;
+
+ofstream outputFileName("output.txt");
 
 struct Args
 {
@@ -23,7 +26,7 @@ struct Args
 	string searchText;
 };
 
-optional<Args>ParseArgs(int argc, char* argv[])
+optional<Args> ParseArgs(int argc, char* argv[])
 {
 	if (argc != 3)
 	{
@@ -34,63 +37,92 @@ optional<Args>ParseArgs(int argc, char* argv[])
 	Args args;
 	args.inputFileName = argv[1];
 	args.searchText = argv[2];
+
 	return args;
 }
 
-/*
-int OpenFile(std::ifstream input, )
+int OpenFile(string inputFileName)
 {
-	input.open(args->inputFileName);
+	std::ifstream input;
+	input.open(inputFileName);
 	if (!input.is_open())
 	{
-		std::cout << "Failed to open " << args->inputFileName << " file for reading\n";
+		std::cout << "Failed to open " << inputFileName << " file for reading\n";
+		return 1;
+	}
+
+	input.open(inputFileName);
+	if (!input.is_open())
+	{
+		cout << "Failed to open " << inputFileName << " file for reading\n";
+		return 1;
+	}
+}
+
+
+/*
+int OpenOutputFile()
+{
+	if (!outputFileName.is_open())
+	{
+		cout << "Failed to open output file for writing\n";
 		return 1;
 	}
 }
 */
 
-
-
-int main(int argc, char* argv[])
+bool FindText(string& searchText)
 {
 	int lineCounter = 0;
-	auto args = ParseArgs(argc, argv);
-
-	// Проверка правильности аргументов командной строки
-	if (!args)
-	{
-		return 1;
-	}
-
-	//Открыть входной файл
-	std::ifstream input;
-	input.open(args->inputFileName);
-	if (!input.is_open())
-	{
-		std::cout << "Failed to open " << args->inputFileName << " file for reading\n";
-		return 1;
-	}
-
+	vector<int> lineNumbers;
 	bool found = false;
-// считать построчно файл
+	
+
+	ifstream input;
+
 	while (!input.eof())
 	{
 		string s;
-	
+
 		while (getline(input, s))
 		{
 			lineCounter++;
-			
-			if (s.find(args->searchText) != std::string::npos) {
-				std::cout << lineCounter << '\n';
+
+			if (s.find(searchText) != std::string::npos)
+			{
+				lineNumbers.push_back(lineCounter);
+				if (outputFileName.is_open())
+				{
+					outputFileName << to_string(lineCounter) << '\n';
+				}
 				found = true;
 			}
 		}
+	}
+	if (!found)
+	{
+		std::cout << "Text not found" << std::endl;
+		return 0;
+	}
 
-		if (!found) {
-			std::cout << "Text not found" << std::endl;
-			return 0;
-		}
+	for (int i = 0; i < lineNumbers.size(); i++)
+	{
+		cout << lineNumbers[i] << endl;
 	}
 }
 
+int main(int argc, char* argv[])
+{
+	auto args = ParseArgs(argc, argv);
+	OpenFile(args->inputFileName);
+	FindText(args->searchText);
+
+
+	
+
+	if (input.bad())
+	{
+		std::cout << "Failed to read data from input file\n";
+		return 1;
+	}
+}

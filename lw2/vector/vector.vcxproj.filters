@@ -15,23 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lw1_01.cpp">
+    <ClCompile Include="vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="input.txt" />
-    <Text Include="Empty.txt" />
-    <Text Include="NotEmpty.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="lw1_01.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Tests.bat">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
 </Project>
