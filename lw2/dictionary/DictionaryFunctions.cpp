@@ -5,7 +5,7 @@ std::optional<std::string> GetDictionaryFileName(int argc, char* argv[])
 	if (argc != 2)
 	{
 		std::cout << "The dictionary has not been set.\n";
-		std::cout << "The default is dictionary_common.txt.\n";
+		std::cout << "The default is defaultDictionary.txt.\n";
 		return "defaultDictionary.txt";
 	}
 
@@ -36,13 +36,13 @@ std::multimap<std::string, std::string> GetDictionaryFromFile(const std::string&
 bool Translation(Dictionary& dictionary)
 {
 	std::string inputWord;
+
 	User user;
-	user.state = WAITING_FOR_WORD;
 
 	while (true)
 	{
-		getline(std::cin, user.newWord);
-		if (user.newWord == EXIT_TEXT)
+		getline(std::cin, user.keyWord);
+		if (user.keyWord == EXIT_TEXT)
 			break;
 		ProcessInputWord(user, dictionary);
 	}
@@ -50,55 +50,51 @@ bool Translation(Dictionary& dictionary)
 	return dictionary.changed;
 }
 
+
 void ProcessInputWord(User& user, Dictionary& dictionary)
 {
-	switch (user.state)
-	{
-	case WAITING_FOR_WORD:
-		user.state = ProcessWordWaiting(user, dictionary);
-		break;
-	case WAITING_FOR_TRANSLATION:
-		user.state = ProcessWordTranslation(user, dictionary);
-		break;
-	default:
-		break;
-	}
-	user.prevWord = user.newWord;
-}
-
-UserState ProcessWordWaiting(User& user, Dictionary& dictionary)
-{
-	if (user.newWord.length() == 0)
-	{
-		return WAITING_FOR_WORD;
-	}
-	std::vector<std::string> translations = FindTranslation(dictionary, user.newWord);
+	// слова нет в словаре
+	std::vector<std::string> translations = FindTranslation(dictionary, user.keyWord);
 	if (translations.size() == 0)
 	{
-		std::cout << "There is no \"" << user.newWord << "\" in dictionary yet." << std::endl;
+		std::cout << "There is no \'" << user.keyWord << "\' in dictionary yet." << std::endl;
 		std::cout << "Write the translation or press enter to skip." << std::endl;
-		return WAITING_FOR_TRANSLATION;
+		getline(std::cin, user.valueWord);
+		if (user.valueWord.size() != 0)
+		{
+			AddTranslation(user, dictionary);
+		}
+		else
+		{
+			std::cout << "Write next word or press \"...\" to exit." << std::endl;
+		}
 	}
+
+	// слово есть в словаре
 	else
 	{
 		std::cout << "The following translations were found for the word:" << std::endl;
 		std::copy(translations.begin(), translations.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
 		std::cout << "Write next word or press \"...\" to exit." << std::endl;
-		return WAITING_FOR_WORD;
 	}
-}
 
-UserState ProcessWordTranslation(User& user, Dictionary& dictionary)
-{
-	AddTranslation(user, dictionary);
-	return WAITING_FOR_WORD;
-}
+	// пустой ввод
+	if (user.keyWord.length() == 0)
+	{
+		std::cout << "Write next word or press \"...\" to exit." << std::endl;
+	}
+}	
+
 
 std::vector<std::string> FindTranslation(const Dictionary& dictionary, const std::string& inputWord)
 {
 	std::vector<std::string> translations;
 
-		std::string lowerInputWord = inputWord;
+	//	transform(inputWord.begin(), inputWord.end(), inputWord.begin(),
+	//	[](unsigned char c) { return std::tolower(c); });
+	
+	std::string lowerInputWord = inputWord;
+		
 
 	for (auto it = dictionary.dict.begin(); it != dictionary.dict.end(); ++it)
 	{
@@ -118,12 +114,12 @@ std::vector<std::string> FindTranslation(const Dictionary& dictionary, const std
 
 void AddTranslation(User& user, Dictionary& dictionary)
 {
-	if (user.newWord.length() != 0 && FindTranslation(dictionary, user.prevWord).size() == 0)
+	if (user.keyWord.length() != 0 && FindTranslation(dictionary, user.valueWord).size() == 0)
 	{
-		dictionary.dict.emplace(user.prevWord, user.newWord);
+		dictionary.dict.emplace(user.keyWord, user.valueWord);
 		dictionary.changed = true;
-		std::cout << "Translation for \"" << user.prevWord << "\" added." << std::endl;
-		std::cout << "Write the next word or press \"...\" to exit." << std::endl;
+		std::cout << "Translation for \"" << user.keyWord << "\" has been saved as \"" << user.valueWord << "\"." << std::endl;
+		std::cout << "Write next word or press \"...\" to exit." << std::endl;
 	}
 }
 
@@ -139,6 +135,8 @@ void SaveDictionary(const Dictionary& dictionary, bool needSaving)
 		{
 			newFile << (*it).first << " " << (*it).second << "\n";
 		}
-		std::cout << "Dictionary has saved in file " << dictionary.fileName << std::endl;
+		std::cout << "Dictionary has been saved to file " << dictionary.fileName << std::endl;
 	}
 }
+
+

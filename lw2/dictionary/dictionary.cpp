@@ -24,6 +24,8 @@
 
 int main(int argc, char* argv[])
 {
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
 	std::cout << "Translates words from Russian into English and vice versa.\n";
 	std::cout << "Input <word> to translate or '...' to exit." << std::endl;
 
@@ -31,16 +33,17 @@ int main(int argc, char* argv[])
 	dictionary.fileName = *GetDictionaryFileName(argc, argv);
 	dictionary.dict = GetDictionaryFromFile(dictionary.fileName);
 
+	//	UseDictionary(dictionary);
+
 	if (Translation(dictionary))
 	{
 		SaveDictionary(dictionary);
 	}
 
-	std::cout << "Thanks for using!" << std::endl;
+	std::cout << "Goodbye!" << std::endl;
 
 	return 0;
 }
-
 
 /*
 #ifndef PCH_H
@@ -292,9 +295,6 @@ int main(int argc, char* argv[])
 
 */
 
-
-
-
 /*
 
 #pragma once
@@ -514,18 +514,6 @@ int main(int argc, char* argv[])
 
 */
 
-
-
-
-
-
-
-
-
-
-
-
-
 /*
 #include <Windows.h>
 #include <boost/algorithm/string.hpp>
@@ -705,7 +693,7 @@ multimap<string, string> GetDictionaryFromFile(const string& fileName)
 					cout << inputKey << endl;
 				}
 			}
-		
+
 		}
 		fs.close();
 		return 0;
@@ -757,107 +745,105 @@ multimap<string, string> GetDictionaryFromFile(const string& fileName)
 
 		*/
 
-
-
-	/*
+/*
 
 
 
 
-	int main(int argc, char* argv[])
+int main(int argc, char* argv[])
+{
+
+
+	//auto args = GetDictionaryFileName(argc, argv);
+	// TODO: проверить, что args не пустой и далее брать значения из него
+
+	std::stringstream input{ argv[1] }; // TODO: istream, rename inputString->input
+	int inputString;
+	if (input >> inputString)
+	{
+		// тело функции
+	}
+	else
+	{
+		cout << "You have entered not a number\n";
+		// TODO: return EXIST_FAILED const
+	}
+
+
+
+
+
+
+
+	multimap<string, string> dictionary;
+	string inputKey;
+	//	bool running = true;
+	dictionary.emplace("Apple", "Яблоко");
+	dictionary.emplace("Apple", "Яблоко2");
+	dictionary.emplace("dog", "собака");
+	dictionary.emplace("cat", "кот");
+
+	cin >> inputKey;
+	while (inputKey != "...")
 	{
 
-
-		//auto args = GetDictionaryFileName(argc, argv);
-		// TODO: проверить, что args не пустой и далее брать значения из него
-
-		std::stringstream input{ argv[1] }; // TODO: istream, rename inputString->input
-		int inputString;
-		if (input >> inputString)
+		if (dictionary.find(inputKey) != dictionary.end())
 		{
-			// тело функции
+
+			auto range = dictionary.equal_range(inputKey);
+			for (auto i = range.first; i != range.second; ++i)
+			{
+				cout << i->second << '\n';
+
+				continue;
+			}
+			cout << "\n";
+			cin >> inputKey;
 		}
 		else
 		{
-			cout << "You have entered not a number\n";
-			// TODO: return EXIST_FAILED const
-		}
-
-
-
-
-
-
-
-		multimap<string, string> dictionary;
-		string inputKey;
-		//	bool running = true;
-		dictionary.emplace("Apple", "Яблоко");
-		dictionary.emplace("Apple", "Яблоко2");
-		dictionary.emplace("dog", "собака");
-		dictionary.emplace("cat", "кот");
-
-		cin >> inputKey;
-		while (inputKey != "...")
-		{
-
-			if (dictionary.find(inputKey) != dictionary.end())
+			string inputValue;
+			cout << "Неизвестное слово " << inputKey << ". Введите перевод или пустую строку для отказа." << endl;
+			cin >> inputValue;
+			if (inputValue != "")
 			{
-
-				auto range = dictionary.equal_range(inputKey);
-				for (auto i = range.first; i != range.second; ++i)
-				{
-					cout << i->second << '\n';
-
-					continue;
-				}
-				cout << "\n";
+				dictionary.emplace(inputKey, inputValue);
+				cout << "Слово '" << inputKey << "' сохранено в словаре как '" << inputValue << "'"
+					 << "\n";
 				cin >> inputKey;
 			}
 			else
 			{
-				string inputValue;
-				cout << "Неизвестное слово " << inputKey << ". Введите перевод или пустую строку для отказа." << endl;
-				cin >> inputValue;
-				if (inputValue != "")
-				{
-					dictionary.emplace(inputKey, inputValue);
-					cout << "Слово '" << inputKey << "' сохранено в словаре как '" << inputValue << "'"
-						 << "\n";
-					cin >> inputKey;
-				}
-				else
-				{
-					cout << "Слово '" << inputValue << "' проигнорировано.";
-					cin >> inputKey;
-				}
-
+				cout << "Слово '" << inputValue << "' проигнорировано.";
+				cin >> inputKey;
 			}
-			continue;
-		}
 
-		return 0;
+		}
+		continue;
 	}
 
-	*/
+	return 0;
+}
 
-	/*
-	читать вход
-	читать файл в map
-	сравнение инпута и ключей из файла
-	вывод ответа если ключ найден
-	вывод предложения добавить слово, если ключа нет
-	выход из программы
-	предложение сохранить словать
-	запись измененной map в файл
+*/
 
-
-	Проверки:
-	отсутствие словаря на входе
-	есть словать - полный
-	есть словарь - пустой
+/*
+читать вход
+читать файл в map
+сравнение инпута и ключей из файла
+вывод ответа если ключ найден
+вывод предложения добавить слово, если ключа нет
+выход из программы
+предложение сохранить словать
+запись измененной map в файл
 
 
+Проверки:
+отсутствие словаря на входе
+есть словать - полный
+есть словарь - пустой
 
 
-	*/
+
+
+*/
